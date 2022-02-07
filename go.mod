@@ -1,4 +1,4 @@
-module Appointy_Assignment
+module github.com/shubham103/Appointy_Assignment
 
 go 1.17
 

@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"strings"
 	"net/http"
-	"Appointy_Assignment/model"
-	"Appointy_Assignment/dbservice"
+	"github.com/shubham103/Appointy_Assignment/model"
+	"github.com/shubham103/Appointy_Assignment/dbservice"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-//function to convert query data into usr struct obj
+
+// function to convert query data into usr struct obj
 func getFormData(r *http.Request)(model.NewUser){
 
 	temp := model.NewUser{}
@@ -36,7 +37,8 @@ func getFormData(r *http.Request)(model.NewUser){
 
 
 }
-//function to create new user , return the objectId from mongodb
+
+// function to create new user , return the objectId from mongodb
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
@@ -44,6 +46,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	dbservice.CreateUser(w,&newUser)
 
 }
+
+// function to break the url to the id from it 
 func getURLFields(str string)[]string{
 	res := []string{}
 	temp := strings.Split(str, "/")
@@ -55,7 +59,8 @@ func getURLFields(str string)[]string{
 	return res
 
 }
-//function to decide between getAll, getById, updateById
+
+// function to decide between getAll, getById, updateById
 func UserSubRouter(w http.ResponseWriter, r *http.Request)  {
 
 	switch  r.Method {
@@ -76,6 +81,8 @@ func UserSubRouter(w http.ResponseWriter, r *http.Request)  {
 	}
 	
 }
+
+// function to merge the data from url and data in db
 func mergeUrlDataDbData(UserDataFromUrl model.NewUser,UserDataFromDb primitive.M)model.NewUser{
 
 	if len(UserDataFromUrl.Name) == 0{
@@ -100,6 +107,8 @@ func mergeUrlDataDbData(UserDataFromUrl model.NewUser,UserDataFromDb primitive.M
 	return UserDataFromUrl
 
 }
+
+// function to update User details
 func updateUserById(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/json")
 	objId := r.FormValue("_id")
@@ -111,14 +120,19 @@ func updateUserById(w http.ResponseWriter, r *http.Request){
 		// update the new values recieved from url
 		UpdatedUser := mergeUrlDataDbData(UserDataFromUrl,UserDataFromDb)
 		// then call the updatedb function with the updated newUser
+		fmt.Println(UpdatedUser)
 		dbservice.UpdateUserById(w, &UpdatedUser,objId)
 	}
 }
+
+// function to get all users
 func getAllUser(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/json")
 	results:= dbservice.GetAllUsers()
 	json.NewEncoder(w).Encode(results)
 }
+
+// function to get user by id
 func getUserById(w http.ResponseWriter, r *http.Request, id string){
 
 	w.Header().Set("Content-Type", "application/json")
@@ -127,6 +141,8 @@ func getUserById(w http.ResponseWriter, r *http.Request, id string){
 	
 
 }
+
+// function to find usrname and password from query parameters
 func getUsernamePasswordFromUrl(r *http.Request)([]string){
 	username:=r.FormValue("username")
 	password:=r.FormValue("password")
@@ -140,6 +156,8 @@ func getUsernamePasswordFromUrl(r *http.Request)([]string){
 
 
 }
+
+// function to get usrer by username and password
 func GetUserByUsernamePassword(w http.ResponseWriter, r *http.Request)  {
 	w.Header().Set("Content-Type", "application/json")
 	usernamePassword := getUsernamePasswordFromUrl(r)

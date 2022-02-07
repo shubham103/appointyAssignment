@@ -3,22 +3,18 @@ package controller
 import (
 	"net/http"
 
-	"Appointy_Assignment/service"
+	"github.com/shubham103/Appointy_Assignment/service"
 )
 
 func HandleRoutes() {
 	// POST request to create new user
 	http.HandleFunc("/user/newuser/", service.CreateUser) 
 	
-	
 	// includes GET request for getAlluser, GET request for getUserById,PUT req. for updateUserById 
 	http.HandleFunc("/user/", service.UserSubRouter)
 	
-	
 	// POST requeset for authenticating username and password
 	http.HandleFunc("/user/userlogin/", service.GetUserByUsernamePassword)
-
-
 
 	// POST request to create new post
 	http.HandleFunc("/post/create", service.CreatePost)

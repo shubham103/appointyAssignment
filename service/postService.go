@@ -1,15 +1,16 @@
 package service
 
 import (
+	"fmt"
 	"net/http"
 	"encoding/json"
-	"Appointy_Assignment/model"
-	"Appointy_Assignment/dbservice"
+	"github.com/shubham103/Appointy_Assignment/model"
+	"github.com/shubham103/Appointy_Assignment/dbservice"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// Funtion to get post model object wiht valuse from query parameter
 func getPostFormData(r *http.Request)(model.NewPost){
-
 	temp := model.NewPost{}
 	if author:=r.FormValue("authorid"); len(author)>0{
 		temp.Author = author
@@ -32,12 +33,33 @@ func getPostFormData(r *http.Request)(model.NewPost){
 
 }
 
+// Function to validate author id before creating new post
+func isValidAuthor(authorid string)bool{
 
+	result := dbservice.GetUserById(authorid)
+
+	if len(result["email"].(string))>0{
+		return true
+	}
+	return false
+
+}
+
+// Function to create new post 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	newPost := getPostFormData(r)
-	dbservice.CreatePost(w,&newPost)
+	if isValidAuthor(newPost.Author){
+		dbservice.CreatePost(w,&newPost)
+	} else {
+		fmt.Fprintf(w, "invalid author id")
+	}
+
+
+	
 }
+
+// Function to delete post 
 func PostDelete(w http.ResponseWriter, r *http.Request){
 	path := getURLFields(r.URL.Path)
 	if len(path)==2{
@@ -45,6 +67,7 @@ func PostDelete(w http.ResponseWriter, r *http.Request){
 	}
 }
 
+// Function to decide GET and PUT for '/post/' url
 func PostSubRouter(w http.ResponseWriter, r *http.Request) {
 
 	switch  r.Method {
@@ -61,12 +84,14 @@ func PostSubRouter(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Function to get app posts
 func getAllPost(w http.ResponseWriter, r *http.Request)  {
 	w.Header().Set("Content-Type", "application/json")
 	results:= dbservice.GetAllPosts()
 	json.NewEncoder(w).Encode(results)
 }
 
+// Functiont to merge data from url and existing data in db
 func mergePostUrlDataDbData(PostDataFromUrl model.NewPost,PostDataFromDb primitive.M)model.NewPost  {
 	if len(PostDataFromUrl.Author) == 0{
 		PostDataFromUrl.Author = PostDataFromDb["author"].(string)
@@ -87,6 +112,7 @@ func mergePostUrlDataDbData(PostDataFromUrl model.NewPost,PostDataFromDb primiti
 	return PostDataFromUrl 
 } 
 
+// Function to update the post 
 func updatePostById(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/json")
 	objId := r.FormValue("_id")
