@@ -17,7 +17,7 @@ func HandleRoutes() {
 	http.HandleFunc("/user/userlogin/", service.GetUserByUsernamePassword)
 
 	// POST request to create new post
-	http.HandleFunc("/post/create", service.CreatePost)
+	http.HandleFunc("/post/create/", service.CreatePost)
 	
 	// GET request for getAllPosts
 	// PUT request for updatePostById

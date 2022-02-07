@@ -38,8 +38,12 @@ func isValidAuthor(authorid string)bool{
 
 	result := dbservice.GetUserById(authorid)
 
-	if len(result["email"].(string))>0{
-		return true
+	switch v:=result["email"].(type){
+		case string:
+			fmt.Print(v)
+			 if len(result["email"].(string))>0{
+				 return true
+			 }
 	}
 	return false
 
@@ -62,8 +66,9 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 // Function to delete post 
 func PostDelete(w http.ResponseWriter, r *http.Request){
 	path := getURLFields(r.URL.Path)
-	if len(path)==2{
-		dbservice.DeletePostById(w,path[1])
+	fmt.Println(path)
+	if len(path)==3{
+		dbservice.DeletePostById(w,path[2])
 	}
 }
 
