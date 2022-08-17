@@ -12,9 +12,7 @@ import (
 
 func main() {
 	// to make connection with mongodb
-	dbservice.ConnectDb()
-
-
+	//dbservice.ConnectDb()
 	controller.HandleRoutes()
 	fmt.Println("server started at localhost:8080...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
